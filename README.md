@@ -1,17 +1,22 @@
-# 🏥 AI Medical Analysis System
-
 <div align="center">
 
-![Python](https://img.shields.io/badge/Python-3.11-blue?logo=python&logoColor=white)
-![Streamlit](https://img.shields.io/badge/Streamlit-1.32+-red?logo=streamlit&logoColor=white)
-![TensorFlow](https://img.shields.io/badge/TensorFlow-CPU-orange?logo=tensorflow&logoColor=white)
-![YOLO](https://img.shields.io/badge/YOLOv8-Ultralytics-purple)
-![Gemini](https://img.shields.io/badge/Google_Gemini-Flash-4285F4?logo=google&logoColor=white)
-![License](https://img.shields.io/badge/License-Academic%20Use-green)
+# 🏥 AI Medical Analysis System
 
-**A hospital-grade AI diagnostic platform combining CT kidney stone analysis and MRI brain tumor segmentation in a single professional interface.**
+**Hospital-grade clinical decision-support platform powered by deep learning.**  
+Combining CT kidney stone analysis and MRI brain tumor segmentation in one professional Streamlit interface.
 
-[Features](#-features) · [Architecture](#-system-architecture) · [Quick Start](#-quick-start) · [Usage](#-usage-guide) · [Models](#-ai-models) · [Troubleshooting](#-troubleshooting)
+[![Python](https://img.shields.io/badge/Python-3.11-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/downloads/release/python-3119/)
+[![Streamlit](https://img.shields.io/badge/Streamlit-1.32+-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white)](https://streamlit.io)
+[![TensorFlow](https://img.shields.io/badge/TensorFlow_CPU-2.15-FF6F00?style=for-the-badge&logo=tensorflow&logoColor=white)](https://www.tensorflow.org/)
+[![YOLOv8](https://img.shields.io/badge/YOLOv8-Ultralytics-5C3EE8?style=for-the-badge)](https://github.com/ultralytics/ultralytics)
+[![Gemini](https://img.shields.io/badge/Google_Gemini-Flash-4285F4?style=for-the-badge&logo=google&logoColor=white)](https://aistudio.google.com/)
+[![License](https://img.shields.io/badge/License-Academic_Use-22C55E?style=for-the-badge)](LICENSE)
+
+[Features](#-features) · [Architecture](#-project-structure) · [AI Models](#-ai-models) · [Quick Start](#-quick-start) · [Usage](#-usage-guide) · [Chatbot](#-bilingual-chatbot) · [Troubleshooting](#-troubleshooting)
+
+---
+
+> ⚕️ **Clinical Disclaimer:** This system is a **decision-support tool only**. All findings must be reviewed and confirmed by a qualified medical professional. It does not substitute for clinical diagnosis or specialist judgement.
 
 </div>
 
@@ -19,86 +24,133 @@
 
 ## 📌 Overview
 
-The **AI Medical Analysis System** is a graduation project that demonstrates how deep learning can be integrated into a clinical decision-support workflow. It provides:
+The **AI Medical Analysis System** is a graduation project demonstrating how state-of-the-art deep learning can be integrated into a clinical imaging workflow. The system runs entirely on CPU, requires no GPU, and produces structured outputs that follow real clinical guidelines.
 
-- **CT Scan Module** — Automated kidney stone detection, radiomics feature extraction, stone classification, and EAU guideline-based treatment recommendations.
-- **MRI Scan Module** — Brain tumor segmentation using U-Net, WHO CNS5-based reporting, and radiomics analysis.
-- **Bilingual AI Chatbot** — Arabic/English RAG-powered chatbot grounded in clinical guidelines for each module.
-- **Patient Records** — Persistent patient database with search, filter, and export (Excel/CSV).
-- **PDF Reports** — Professional hospital-style reports generated automatically after each scan.
+**Two complete diagnostic pipelines in one app:**
 
-> ⚠️ **Clinical Disclaimer:** This system is a decision-support tool only. All findings must be reviewed by a qualified medical professional. It is not a substitute for clinical diagnosis.
+- **CT Kidney Stone Module** — Detects stones using a custom-trained YOLOv8 model, extracts radiomics features, classifies stones into phenotypes (soft/dense), and retrieves evidence-based treatment options directly from the **2026 EAU Urolithiasis Guidelines**.
+- **MRI Brain Tumor Module** — Segments tumor regions using a custom-trained U-Net, extracts radiomics features, classifies tumor type (Glioma / Meningioma / Pituitary / None), and generates reports aligned with the **WHO CNS5 Brain Tumor Classification**.
+
+Both modules share a unified bilingual RAG chatbot (Arabic + English) backed by ChromaDB and powered by Google Gemini Flash.
 
 ---
 
 ## ✨ Features
 
-| Feature | Description |
+### 🩻 CT — Kidney Stone Analysis
+| Step | What Happens |
 |---|---|
-| 🩻 **CT Kidney Stone Detection** | YOLOv8 model detects stones with bounding boxes and confidence scores |
-| 📐 **Radiomics Analysis** | Extracts texture, shape, and intensity features from the detected region |
-| 🔬 **Stone Classification** | KMeans clustering classifies stones into soft/dense phenotypes |
-| 📋 **EAU Treatment Guidance** | RAG retrieval from EAU Urolithiasis Guidelines for treatment options |
-| 🧠 **MRI Brain Tumor Segmentation** | U-Net model segments tumor regions with pixel-level precision |
-| 🏷️ **Tumor Classification** | Identifies Glioma, Meningioma, Pituitary, or No Tumor |
-| 📖 **WHO CNS5 Reporting** | Reports aligned with the latest WHO Brain Tumor classification |
-| 💬 **Bilingual Chatbot** | Arabic & English medical Q&A powered by Gemini + ChromaDB |
-| 👥 **Patient Database** | CSV-backed patient records with full search and export |
-| 📄 **PDF Report Generation** | Hospital-grade PDF reports via ReportLab |
+| **Detection** | Custom YOLOv8 model localizes stones with bounding boxes, confidence scores, and pixel dimensions |
+| **Size Estimation** | Stone diameter estimated in mm using configurable mm/pixel calibration (`<5 mm`, `5-10 mm`, `10-20 mm`, `>20 mm`) |
+| **Radiomics** | 93 features extracted (first-order, GLCM, GLRLM, GLSZM, GLDM, NGTDM) via a pure NumPy/scikit-image implementation — no PyRadiomics dependency |
+| **Phenotyping** | KMeans classifier assigns each stone to a clinical phenotype: **Soft/Low-Density** (uric acid / struvite) or **Dense/Calcified** (calcium oxalate / phosphate) |
+| **EAU Guidance** | RAG retrieval from the 2026 EAU Urolithiasis Guidelines returns treatment options (MET, SWL, URS, PCNL) matched to stone size and phenotype |
+| **PDF Report** | ReportLab generates a hospital-style A4 PDF with patient info, annotated scan, findings, and recommendations |
+
+### 🧠 MRI — Brain Tumor Analysis
+| Step | What Happens |
+|---|---|
+| **Segmentation** | U-Net (256×256 grayscale input, binary mask output) produces pixel-level tumor delineation |
+| **Tumor Area** | Computes tumor coverage as percentage of total scan area |
+| **Radiomics** | Same 93-feature extraction applied to the segmented ROI |
+| **Classification** | Heuristic classifier identifies tumor type: **Glioma**, **Meningioma**, **Pituitary Tumor**, or **No Tumor** |
+| **WHO CNS5 Reporting** | RAG retrieval from WHO CNS5 guidelines provides tumor-specific clinical context |
+| **PDF Report** | Same hospital-grade PDF format with segmentation overlay and tumor profile |
+
+### 🔧 Shared Infrastructure
+- **Bilingual AI Chatbot** — Arabic/English auto-detection, RAG + Gemini Flash, one chatbot per module
+- **Patient Database** — CSV-backed registry, auto-assigned record IDs (`REC-YYYYMMDD-NNNN`), full search & filter
+- **Excel/CSV Export** — One-click patient record export via openpyxl
+- **Progress Charts** — If a patient has ≥2 scans, a history progress chart is included in the PDF (page 2)
+- **Hospital UI** — Custom Streamlit CSS: Inter font, deep navy + emerald + gold palette, stat cards, chat bubbles
 
 ---
 
-## 🏗️ System Architecture
+## 📁 Project Structure
 
 ```
 AI-Medical-Analysis-System/
-├── app.py                      # Streamlit entry point & UI
-├── config.py                   # Global configuration & constants
-├── setup.py                    # One-time initialization script
-├── requirements.txt            # Python dependencies
+│
+├── app.py                          # Streamlit entry point — UI, tabs, CSS, layout
+├── config.py                       # All paths, colors, model params, cluster profiles
+├── setup.py                        # One-time init: verify files, rebuild ChromaDB, preload embeddings
+├── requirements.txt                # All Python dependencies (pinned ranges)
 │
 ├── modules/
-│   ├── ct_pipeline.py          # CT: YOLO detection + Radiomics + KMeans
-│   ├── mri_pipeline.py         # MRI: U-Net segmentation + Radiomics
-│   ├── rag.py                  # RAG engine + bilingual chatbot (Gemini)
-│   ├── patients_db.py          # Patient records management (CSV)
-│   ├── report.py               # PDF report generation (ReportLab)
-│   └── radiomics_lite.py       # Lightweight radiomics (no PyRadiomics dep)
+│   ├── CT processing Pipline.py    # YOLO → Radiomics → KMeans → clinical translation
+│   ├── MRI processing pipline.py   # U-Net → Radiomics → tumor classification
+│   ├── Unified RAG Module.py       # ChromaDB retrieval + cross-encoder reranking + Gemini
+│   ├── patients_db store.py        # CSV patient registry (add, search, export)
+│   ├── Report Generation.py        # ReportLab A4 PDF generator (2-page with chart)
+│   ├── radiomics_lite.py           # 93-feature radiomics — pure NumPy/scikit-image fallback
+│   └── __init__.py
 │
 ├── models/
-│   ├── yolo_kidney.pt          # YOLOv8 kidney stone detection model
-│   ├── kmeans_kidney.pkl       # KMeans stone classifier
-│   ├── scaler_kidney.pkl       # Feature scaler for KMeans
-│   └── segmentation_model.h5   # U-Net brain tumor segmentation (372 MB, not in repo)
+│   ├── yolo_kidney.pt              # Custom-trained YOLOv8 — kidney stone detection ✅
+│   ├── kmeans_kidney.pkl           # Trained KMeans stone phenotype classifier ✅
+│   ├── scaler_kidney.pkl           # Feature scaler for KMeans input ✅
+│   └── segmentation_model.h5       # Custom-trained U-Net — brain tumor segmentation ⚠️ (372 MB, not in repo)
 │
 ├── chroma_dbs/
-│   ├── ct/                     # EAU Urolithiasis Guidelines vector store
-│   └── mri/                    # WHO CNS5 Brain Tumor vector store
+│   ├── ct/
+│   │   ├── chroma.sqlite3          # EAU 2026 Urolithiasis Guidelines vector store (384-dim)
+│   │   ├── STONE_Markdown .md      # Source guideline document (markdown)
+│   │   └── build_chroma.py         # Script used to build the CT vector store
+│   └── mri/
+│       ├── chroma.sqlite3          # WHO CNS5 Brain Tumor guidelines vector store (384-dim)
+│       └── MRI.pdf                 # Source guideline document (PDF)
+│
+├── Nootbooks/
+│   ├── CT/
+│   │   ├── YOLOv8L.ipynb           # YOLOv8-L training notebook
+│   │   ├── YOLOv8m.ipynb           # YOLOv8-M training notebook
+│   │   └── PYRadiomics and K-mean.ipynb  # Radiomics extraction + KMeans training
+│   └── MRI/
+│       ├── U-net Model.ipynb       # U-Net architecture + training
+│       ├── Test model.ipynb        # Model evaluation notebook
+│       └── PyRadiomics.ipynb       # MRI radiomics experiments
 │
 ├── sample_images/
-│   ├── ct/                     # Sample CT scans for demo
-│   └── mri/                    # Sample MRI scans for demo
+│   ├── ct/                         # 5 real CT scan samples for demo
+│   └── mri/                        # 4 MRI samples (glioma, meningioma, pituitary, no_tumor)
 │
-├── assets/                     # UI assets & branding
-├── patients_data/              # Auto-created: patient records (CSV)
+├── assets/                         # UI assets and branding
+│
+├── patients_data/                  # Auto-created at runtime — patient CSV records
+│
 └── .streamlit/
-    └── config.toml             # Streamlit theme configuration
+    └── config.toml                 # Theme: navy primary, white bg, sans-serif font, 50MB upload limit
 ```
 
 ---
 
 ## 🤖 AI Models
 
-| Model | Task | Framework |
-|---|---|---|
-| **YOLOv8** (custom-trained) | Kidney stone detection in CT | Ultralytics |
-| **U-Net** (custom-trained) | Brain tumor segmentation in MRI | TensorFlow / Keras |
-| **KMeans** | Stone phenotype clustering (soft vs. dense) | scikit-learn |
-| **all-MiniLM-L6-v2** | Text embeddings for RAG | sentence-transformers |
-| **ms-marco-MiniLM-L-6-v2** | Cross-encoder reranking | sentence-transformers |
-| **Gemini Flash** | Clinical report generation & chatbot | Google Generative AI |
+| Model | Task | Framework | Notes |
+|---|---|---|---|
+| **YOLOv8** (custom) | Kidney stone detection | Ultralytics | Conf: 0.5, IoU: 0.45, CPU inference |
+| **U-Net** (custom) | Brain tumor segmentation | TensorFlow/Keras CPU | 256×256 grayscale → binary mask |
+| **KMeans** (trained) | Stone phenotype clustering | scikit-learn | 2 clusters: soft vs. dense |
+| **Scaler** | KMeans feature normalization | scikit-learn | Fitted on training radiomics features |
+| **all-MiniLM-L6-v2** | Text embeddings (RAG) | sentence-transformers | 384-dim vectors |
+| **ms-marco-MiniLM-L-6-v2** | Cross-encoder reranking | sentence-transformers | Top-10 → Top-5 rerank |
+| **Gemini Flash Lite** | Report generation + chatbot | Google Generative AI | Configurable API key |
 
-> 📌 **Note:** `segmentation_model.h5` (~372 MB) is not included in the repository due to size. See [Quick Start](#-quick-start) for setup instructions.
+### Stone Phenotype Profiles
+
+| Cluster | Name | Stone Type | Typical Cause |
+|---|---|---|---|
+| **0** | Soft / Low-Density | Uric acid / Struvite | Infection or metabolic imbalance |
+| **1** | Dense / Calcified | Calcium oxalate / Phosphate | Dehydration, hypercalciuria |
+
+### Brain Tumor Profiles
+
+| Class | Description |
+|---|---|
+| **Glioma** | Tumors from glial cells; ranges from low-grade to glioblastoma |
+| **Meningioma** | Usually benign, slow-growing, arises from meninges |
+| **Pituitary Tumor** | Usually benign adenoma; may cause hormonal imbalance |
+| **No Tumor** | No suspicious mass detected by the segmentation model |
 
 ---
 
@@ -106,9 +158,12 @@ AI-Medical-Analysis-System/
 
 ### Prerequisites
 
-- **Python 3.11** (required — TensorFlow CPU does not support 3.12+)
-- **4 GB RAM** minimum (8 GB recommended)
-- **~800 MB disk space** for all models and dependencies
+- **Python 3.11** — required. TensorFlow CPU does not support Python 3.12+.
+- **~800 MB disk space** for models and dependencies
+- **4 GB RAM** minimum (8 GB recommended for smooth performance)
+- No GPU required — runs on CPU
+
+---
 
 ### Step 1 — Clone the repository
 
@@ -117,94 +172,149 @@ git clone https://github.com/medo832/AI-Medical-Analysis-System.git
 cd AI-Medical-Analysis-System
 ```
 
-### Step 2 — Add the segmentation model
+---
 
-Download `segmentation_model.h5` separately and place it inside the `models/` folder:
+### Step 2 — Add the U-Net segmentation model
+
+The file `segmentation_model.h5` (~372 MB) is not stored in this repository due to GitHub's file size limits.
+
+Download it separately and place it here:
 
 ```
 models/
-└── segmentation_model.h5   ← place it here (372 MB)
+└── segmentation_model.h5   ← place here
 ```
 
-Without this file, the MRI tab will not function.
+> The CT module works without this file. The MRI tab will throw an error until it is present.
 
-### Step 3 — Install dependencies
+---
+
+### Step 3 — Install Python 3.11
+
+```bash
+# Verify you have Python 3.11
+py -3.11 --version
+# Expected output: Python 3.11.x
+```
+
+If not installed, download from [python.org](https://www.python.org/downloads/release/python-3119/) — choose **Windows installer (64-bit)** and check ✅ **Add Python to PATH**.
+
+---
+
+### Step 4 — Install dependencies
 
 ```bash
 py -3.11 -m pip install -r requirements.txt
 ```
 
-> ⏱️ First install takes 10–20 minutes (TensorFlow is large).
+> ⏱️ First install takes 10–20 minutes. TensorFlow CPU is large. Leave the terminal running.
 
-### Step 4 — Run one-time setup
+---
+
+### Step 5 — Run one-time setup
 
 ```bash
 py -3.11 setup.py
 ```
 
-This script verifies models, rebuilds the ChromaDB vector stores with the correct dimensions, and downloads the embedding model (~90 MB). Takes ~5–10 minutes on first run only.
+This script:
+1. Verifies all required model files are present
+2. Rebuilds the CT ChromaDB vector store at 384-dim (the correct embedding dimension)
+3. Pre-downloads the sentence-transformer embedding model (~90 MB)
+4. Runs a quick YOLO inference test
 
-### Step 5 — Launch the app
+> ⏱️ Takes 5–10 minutes on first run only. Must be run before launching the app.
+
+---
+
+### Step 6 — Launch the app
 
 ```bash
 py -3.11 -m streamlit run app.py
 ```
 
-The browser will open automatically at `http://localhost:8501` 🎉
+The browser opens automatically at **http://localhost:8501** 🎉
 
 ---
 
 ## 📖 Usage Guide
 
 ### 🏠 Dashboard
-The home screen shows overall statistics and a summary of recent analyses.
+The home screen displays live statistics (total patients, CT scans, MRI scans) and a summary of the most recent analyses.
+
+---
 
 ### 🩻 CT Scan Tab
-1. Enter patient information
-2. Upload a CT scan image or choose a sample
+
+1. Fill in patient details (name, ID, age, gender, referring physician, clinical indication)
+2. Upload a CT scan image **or** select one of the 5 included samples
 3. Click **▶ Run CT Analysis**
-4. View results across 4 sub-tabs:
-   - **Detection** — YOLO bounding box + confidence
-   - **Radiomics** — Extracted texture & shape features
-   - **EAU Recommendation** — Guideline-based treatment options
-   - **PDF Report** — Download the full clinical report
-5. Use the **Chatbot** sidebar to ask questions about the findings
+4. Results appear across 4 sub-tabs:
+
+| Sub-tab | Contents |
+|---|---|
+| **Detection** | Annotated image with YOLO bounding boxes, confidence, estimated stone size in mm |
+| **Radiomics** | Table of 93 extracted features + stone phenotype cluster assignment |
+| **EAU Recommendation** | Retrieved treatment options from 2026 EAU Urolithiasis Guidelines |
+| **PDF Report** | Preview + download button for the full hospital-style report |
+
+5. Use the **Chatbot** panel in the sidebar for any follow-up questions about the findings
+
+---
 
 ### 🧠 MRI Scan Tab
-Same workflow as CT. The U-Net model produces a pixel-level segmentation mask, and results are classified according to WHO CNS5 (Glioma / Meningioma / Pituitary / No Tumor).
+
+Same workflow as CT. The U-Net produces a segmentation mask overlaid on the original scan. Results include tumor type classification, radiomics features, WHO CNS5 clinical context, and a PDF report.
+
+Four sample MRI scans are included: glioma, meningioma, pituitary tumor, and a no-tumor case.
+
+---
 
 ### 👥 Patients Tab
-- Search by patient ID or name
-- Filter by scan type (CT / MRI)
-- Export records as **Excel** or **CSV**
+
+- **Search** by patient ID or name
+- **Filter** by modality (CT / MRI)
+- **Export** the full database as Excel (`.xlsx`) or CSV
+
+All records are auto-saved after each analysis with a unique record ID in the format `REC-YYYYMMDD-NNNN`.
 
 ---
 
 ## 💬 Bilingual Chatbot
 
-Each module includes an integrated chatbot that automatically detects and responds in **Arabic or English**.
+Each module includes a chatbot that **automatically detects whether you write in Arabic or English** and responds in the same language.
 
-Answers are retrieved from the clinical guideline databases using RAG (Retrieval-Augmented Generation), then enhanced by Gemini Flash.
+Answers are grounded in the clinical guideline databases via RAG:
+- CT chatbot uses the **2026 EAU Urolithiasis Guidelines**
+- MRI chatbot uses the **WHO CNS5 Brain Tumor Classification**
+
+Results are retrieved with `all-MiniLM-L6-v2` embeddings, reranked with a cross-encoder, then passed to **Gemini Flash** for a fluent, patient-friendly response.
 
 **Example questions:**
 
 ```
-EN: What is the first-line treatment for a 6mm distal ureteric stone?
-AR: ما هي مضاعفات تفتيت الحصوات بالموجات التصادمية؟
+# English
+"What is the first-line treatment for a 6mm distal ureteric stone?"
+"When is PCNL preferred over SWL?"
+"Role of IDH mutation in glioma grading?"
+"What are the surgical options for meningioma?"
 
-EN: Role of IDH mutation in glioma grading?
-AR: ما هي درجات تصنيف الورم الدبقي؟
+# Arabic
+"ما هي مضاعفات تفتيت الحصوات بالموجات التصادمية؟"
+"متى يُفضّل استخدام منظار الحالب على تفتيت الحصوات؟"
+"ما هي درجات تصنيف الورم الدبقي وفق WHO؟"
+"ما علاج ورم الغدة النخامية الحميد؟"
 ```
 
 ---
 
 ## 🔑 Gemini API Key
 
-A default Gemini API key is included for demo purposes. To use your own key:
+A default Gemini API key is bundled for demo purposes. To use your own free key:
 
 1. Visit [Google AI Studio](https://aistudio.google.com/app/apikey)
-2. Generate a free API key
-3. Paste it into the **Custom Gemini Key** field in the app's sidebar
+2. Create a free API key
+3. Paste it into the **Custom Gemini Key** field in the app sidebar
 
 ---
 
@@ -212,29 +322,60 @@ A default Gemini API key is included for demo purposes. To use your own key:
 
 | Problem | Solution |
 |---|---|
-| `Python was not found` | Install Python 3.11 from [python.org](https://www.python.org/downloads/release/python-3119/) — check ✅ **Add Python to PATH** |
+| `Python was not found` | Install Python 3.11 from [python.org](https://www.python.org/downloads/release/python-3119/) and check ✅ **Add Python to PATH** |
 | `Brain segmentation model not found` | Copy `segmentation_model.h5` into the `models/` folder |
-| `pip is not recognized` | Use `py -3.11 -m pip` instead of `pip` |
-| TensorFlow install error | Confirm you are using Python 3.11, not 3.12 or 3.13 |
-| ChromaDB dimension mismatch | Re-run `py -3.11 setup.py` |
+| `pip is not recognized` | Use `py -3.11 -m pip install` instead of `pip install` |
+| TensorFlow install error | Confirm you are on Python 3.11 — TensorFlow CPU does not support 3.12 or 3.13 |
+| ChromaDB dimension mismatch | Re-run `py -3.11 setup.py` to rebuild the vector store |
 | PDF not downloading | Try Microsoft Edge instead of Chrome, or check your Downloads folder |
+| App is slow on first run | Normal — models are loading into RAM for the first time. Second run is much faster |
+| `ModuleNotFoundError` | Re-run `py -3.11 -m pip install -r requirements.txt` |
 
 ---
 
-## 🧰 Tech Stack
+## 🧰 Full Tech Stack
 
-| Layer | Technology |
+| Layer | Technology | Purpose |
+|---|---|---|
+| **UI** | Streamlit 1.32+ | Web interface, tabs, sidebar, file upload |
+| **Styling** | Custom CSS (Inter font, CSS variables) | Hospital-grade look and feel |
+| **CT Detection** | YOLOv8 (Ultralytics) | Bounding box detection of kidney stones |
+| **MRI Segmentation** | U-Net (TensorFlow/Keras CPU) | Pixel-level brain tumor mask |
+| **Stone Classification** | KMeans + Scaler (scikit-learn) | Phenotype clustering (soft vs. dense) |
+| **Radiomics** | Custom `radiomics_lite.py` (NumPy + scikit-image) | 93 imaging features without PyRadiomics |
+| **Vector Store** | ChromaDB + LangChain | Guideline document embeddings |
+| **Embeddings** | sentence-transformers (all-MiniLM-L6-v2) | 384-dim semantic text embeddings |
+| **Reranking** | sentence-transformers (ms-marco-MiniLM-L-6-v2) | Cross-encoder relevance reranking |
+| **LLM** | Google Gemini Flash Lite | Report generation and chatbot responses |
+| **PDF** | ReportLab (A4) | Hospital-style clinical reports |
+| **Patient Records** | Pandas + CSV + openpyxl | Patient database and Excel export |
+| **Image Processing** | OpenCV + Pillow | Scan loading, annotation, mask overlay |
+
+---
+
+## 📓 Training Notebooks
+
+The `Nootbooks/` directory contains the original Jupyter notebooks used to train all models:
+
+| Notebook | Description |
 |---|---|
-| **UI** | Streamlit |
-| **CT Detection** | YOLOv8 (Ultralytics) |
-| **MRI Segmentation** | U-Net (TensorFlow / Keras) |
-| **Stone Classification** | KMeans (scikit-learn) |
-| **Radiomics** | Custom lightweight radiomics (scikit-image) |
-| **RAG / Vector Store** | ChromaDB + LangChain |
-| **Embeddings** | sentence-transformers (all-MiniLM-L6-v2) |
-| **LLM** | Google Gemini Flash |
-| **PDF Generation** | ReportLab |
-| **Patient Records** | Pandas + CSV + openpyxl |
+| `CT/YOLOv8L.ipynb` | YOLOv8-Large training on kidney stone dataset |
+| `CT/YOLOv8m.ipynb` | YOLOv8-Medium training (comparison run) |
+| `CT/PYRadiomics and K-mean.ipynb` | Radiomics feature extraction + KMeans phenotyping |
+| `MRI/U-net Model.ipynb` | U-Net architecture definition and training |
+| `MRI/Test model.ipynb` | Model evaluation and segmentation visualization |
+| `MRI/PyRadiomics.ipynb` | MRI radiomics experiments |
+
+---
+
+## 📊 Clinical Knowledge Bases
+
+| Module | Guideline Source | Embedding Dimensions |
+|---|---|---|
+| CT | EAU Urolithiasis Guidelines 2026 | 384-dim (all-MiniLM-L6-v2) |
+| MRI | WHO CNS5 Brain Tumor Classification | 384-dim (all-MiniLM-L6-v2) |
+
+Retrieval pipeline: `similarity_search (top-10)` → `cross-encoder rerank (top-5)` → `Gemini Flash synthesis`
 
 ---
 
@@ -242,18 +383,22 @@ A default Gemini API key is included for demo purposes. To use your own key:
 
 This project is released for **academic and research purposes only**.
 
-It is not intended for clinical deployment without appropriate regulatory approval. All medical decisions must be made by qualified healthcare professionals.
+It is not approved for clinical deployment. All medical decisions require review by a licensed healthcare professional.
 
 ---
 
 ## 👨‍💻 Contact us
 
-**Our Team** — Final Graduation Project  
-📧 mse90901@gmail.com  
-🔗 [GitHub](https://github.com/medo832)
+**Team** — Computer Science / AI Graduation Project
+
+📧 [mse90901@gmail.com](mailto:mse90901@gmail.com)  
+🔗 [github.com/medo832](https://github.com/medo832)
 
 ---
 
 <div align="center">
-  <sub>Built with ❤️ as a graduation project · Not a substitute for professional medical diagnosis</sub>
+
+**Built as a Final Graduation Project**  
+*Kidney Stone Detection · Brain Tumor Segmentation · Clinical Decision Support . Patient assistant*
+
 </div>
