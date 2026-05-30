@@ -246,10 +246,10 @@ It is not intended for clinical deployment without appropriate regulatory approv
 
 ---
 
-## 👨‍💻 Author
+## 👨‍💻 Contact us
 
 **Mohamed** — Final Graduation Project  
-📧 moel832005@gmail.com  
+📧 mse90901@gmail.com  
 🔗 [GitHub](https://github.com/medo832)
 
 ---
