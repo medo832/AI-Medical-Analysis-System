@@ -248,7 +248,7 @@ It is not intended for clinical deployment without appropriate regulatory approv
 
 ## 👨‍💻 Contact us
 
-**Mohamed** — Final Graduation Project  
+**Our Team** — Final Graduation Project  
 📧 mse90901@gmail.com  
 🔗 [GitHub](https://github.com/medo832)
 
