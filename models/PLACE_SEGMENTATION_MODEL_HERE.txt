@@ -1,0 +1,11 @@
+⚠️ IMPORTANT - ضع ملف الموديل هنا ⚠️
+
+The brain segmentation model (segmentation_model.h5, ~372 MB) is NOT
+included in the zip because it's too large to ship.
+
+Please copy your file `segmentation_model.h5` into THIS folder
+before running the MRI module of the app.
+
+==============================================================
+انسخ ملف segmentation_model.h5 إلى هذا المجلد قبل تشغيل تاب MRI
+==============================================================

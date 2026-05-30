@@ -1,0 +1,69 @@
+# =========================
+# Large model files
+# =========================
+models/segmentation_model.h5
+
+# =========================
+# Patient data (sensitive)
+# =========================
+patients_data/
+
+# =========================
+# ChromaDB vector stores (can be rebuilt with setup.py)
+# =========================
+chroma_dbs/
+
+# =========================
+# Python
+# =========================
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg
+*.egg-info/
+dist/
+build/
+*.so
+
+# =========================
+# Virtual environments
+# =========================
+venv/
+env/
+.venv/
+.env/
+
+# =========================
+# Streamlit cache
+# =========================
+.streamlit/secrets.toml
+
+# =========================
+# OS files
+# =========================
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# =========================
+# IDE
+# =========================
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# =========================
+# Jupyter
+# =========================
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# =========================
+# Logs & temp
+# =========================
+*.log
+*.tmp
+*.bak
